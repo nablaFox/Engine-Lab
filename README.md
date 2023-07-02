@@ -14,6 +14,8 @@ sudo apt install vulkan-validationlayers-dev spirv-tools
 sudo apt install libxxf86vm-dev libxi-dev
 ```
 
+*Note: you will also need a shader compiler.*
+
 Then run:
 
 ```sh

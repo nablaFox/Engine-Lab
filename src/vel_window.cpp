@@ -4,7 +4,10 @@
 
 namespace vel {
 
-VelWindow::VelWindow(const uint32_t w, const uint32_t h, const char* name) : width(w), height(h), title(name) { }
+VelWindow::VelWindow(
+	const uint32_t w,
+	const uint32_t h,
+	const char* name) : width(w), height(h), title(name) { }
 
 VelWindow::~VelWindow() {
 	glfwDestroyWindow(window);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vel_window.hpp"
+#include "vel_vulkan.hpp"
 
 #include <memory>
 #include <vector>
@@ -19,7 +20,7 @@ const GameEngineSettings DefaultSettings; // TODO should be in VelEngine
 class VelEngine {
 public:
 	VelEngine(const GameEngineSettings& settings = DefaultSettings);
-	~VelEngine() {};
+	~VelEngine();
 
 	VelEngine(const VelEngine&) = delete;
 	VelEngine& operator=(const VelEngine&) = delete;
@@ -27,10 +28,11 @@ public:
 	void createGameWindow();
 	void processEvents();
 
-	bool isRunning() { return window->isOpen(); }
+	bool isRunning() { return window.isOpen(); }
 
 protected:
-	std::unique_ptr<VelWindow> window;
+	VelWindow window;
+	VelVulkan vulkan;
 };
 
 }

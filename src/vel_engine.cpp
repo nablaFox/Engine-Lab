@@ -2,20 +2,20 @@
 
 namespace vel {
 
-VelEngine::VelEngine(const GameEngineSettings& settings) {
-	window = std::make_unique<VelWindow>(
-		settings.windowWidth,
-		settings.windowHeight,
-		settings.windowTitle
-	);
+VelEngine::VelEngine(const GameEngineSettings& settings) :
+	window{ settings.windowWidth, settings.windowHeight, settings.windowTitle },
+	vulkan{ window } { }
+
+VelEngine::~VelEngine() {
 }
 
 void VelEngine::createGameWindow() {
-	window->initWindow();
+	window.initWindow();
+	vulkan.initVulkan();
 }
 
 void VelEngine::processEvents() {
-	window->pollEvents();
+	window.pollEvents();
 }
 
 }

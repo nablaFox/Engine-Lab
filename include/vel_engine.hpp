@@ -15,11 +15,11 @@ struct GameEngineSettings {
 	const uint32_t windowHeight = 600;
 };
 
-const GameEngineSettings DefaultSettings; // TODO should be in VelEngine
+const GameEngineSettings defaultSettings; // TODO should be in VelEngine
 
 class VelEngine {
 public:
-	VelEngine(const GameEngineSettings& settings = DefaultSettings);
+	VelEngine(const GameEngineSettings& settings = defaultSettings);
 	~VelEngine();
 
 	VelEngine(const VelEngine&) = delete;

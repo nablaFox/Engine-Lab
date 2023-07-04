@@ -1,6 +1,6 @@
 #pragma once
 
-#define GLFW_INCLUDE_VULKAN
+#define GLFW_INCLUDE_VULKAN // TEMP
 #include <GLFW/glfw3.h>
 
 namespace vel {
@@ -19,6 +19,7 @@ public:
 	bool isOpen() { return glfwWindowShouldClose(window); }
 	void pollEvents() { glfwPollEvents(); }
 	VkExtent2D getExtent() { return { width, height }; }
+	VkExtent2D getActualExtent();
 
 private:
 	uint32_t width;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "vel_window.hpp"
-#include "vel_vulkan.hpp"
+#include "vel_vulkan_device.hpp"
 
 #include <memory>
 #include <vector>

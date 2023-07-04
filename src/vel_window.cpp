@@ -28,4 +28,14 @@ void VelWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR* surface) 
 	}
 }
 
+VkExtent2D VelWindow::getActualExtent() {
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
+
+	return {
+		static_cast<uint32_t>(width),
+		static_cast<uint32_t>(height)
+	};
+};
+
 }

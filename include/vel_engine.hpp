@@ -27,6 +27,7 @@ public:
 
 	void createGameWindow();
 	void processEvents();
+	void drawTriangle();
 
 	bool isRunning() { return window.isOpen(); }
 

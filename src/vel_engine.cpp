@@ -18,4 +18,8 @@ void VelEngine::processEvents() {
 	window.pollEvents();
 }
 
+void VelEngine::drawTriangle() {
+	vulkan.testDrawFrame();
+}
+
 }

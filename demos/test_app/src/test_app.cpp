@@ -13,5 +13,6 @@ void TestApp::initialize() {
 void TestApp::run() {
 	while (!engine.isRunning()) {
 		engine.processEvents();
+		engine.drawTriangle();
 	}
 }

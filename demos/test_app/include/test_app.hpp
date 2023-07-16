@@ -4,11 +4,12 @@
 
 class TestApp {
 public:
-	TestApp();
-	~TestApp();
+	TestApp() { };
+	~TestApp() { };
 
-	void initialize();
+	void init();
 	void run();
+	void cleanup();
 
 protected:
 	vel::VelEngine engine;

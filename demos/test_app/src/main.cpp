@@ -6,13 +6,9 @@
 int main() {
 	TestApp app;
 
-	try {
-		app.initialize();
-		app.run();
-	} catch (const std::exception& e) {
-		std::cerr << e.what() << std::endl;
-		return 1;
-	}
+	app.init();
+	app.run();
+	app.cleanup();
 
 	return 0;
 }

@@ -1,18 +1,13 @@
 #include "../include/test_app.hpp"
 
-TestApp::TestApp() {
-}
+void TestApp::init() {
 
-TestApp::~TestApp() {
-}
-
-void TestApp::initialize() {
-	engine.createGameWindow();
 }
 
 void TestApp::run() {
-	while (!engine.isRunning()) {
-		engine.processEvents();
-		engine.drawTriangle();
-	}
+
+}
+
+void TestApp::cleanup() {
+
 }

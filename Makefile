@@ -9,10 +9,10 @@ GLSLC = glslc
 SRC_PATH = src
 BIN_PATH = bin
 SHADERS_PATH = shaders
-DEMO_PATH = demos/test_app
+DEMO_PATH = demos/empty_window
 
 # files
-SRC = $(wildcard $(SRC_PATH)/*.cpp) $(wildcard $(DEMO_PATH)/src/*.cpp) lib/vk-bootstrap/VkBootstrap.cpp
+SRC = $(wildcard $(SRC_PATH)/*.cpp) $(wildcard $(DEMO_PATH)/*.cpp) lib/vk-bootstrap/VkBootstrap.cpp
 OBJ = $(SRC:.cpp=.o)
 BIN = $(BIN_PATH)/demo
 SHADERS_VERT = $(wildcard $(SHADERS_PATH)/*.vert)

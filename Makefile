@@ -1,7 +1,7 @@
 # tool
 CXX = g++
 CFLAGS = -std=c++17 -Wall -Wextra -Wpedantic
-CFLAGS += -Ilib/glm -Ilib/glfw/include -Ilib/vk-bootstrap
+CFLAGS += -Ilib/glm -Ilib/glfw/include -Ilib/vkbootstrap
 LDFLAGS = lib/glfw/src/libglfw3.a -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 GLSLC = glslc
 
@@ -9,10 +9,10 @@ GLSLC = glslc
 SRC_PATH = src
 BIN_PATH = bin
 SHADERS_PATH = shaders
-DEMO_PATH = demos/empty_window
+DEMO_PATH = demos/general_demo
 
 # files
-SRC = $(wildcard $(SRC_PATH)/*.cpp) $(wildcard $(DEMO_PATH)/*.cpp) lib/vk-bootstrap/VkBootstrap.cpp
+SRC = $(wildcard $(SRC_PATH)/*.cpp) $(wildcard $(DEMO_PATH)/*.cpp) lib/vkbootstrap/VkBootstrap.cpp
 OBJ = $(SRC:.cpp=.o)
 BIN = $(BIN_PATH)/demo
 SHADERS_VERT = $(wildcard $(SHADERS_PATH)/*.vert)

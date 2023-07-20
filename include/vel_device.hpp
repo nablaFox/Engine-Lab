@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vel_core.hpp"
+#include "vel_deletion_queue.hpp"
 
 #include <vector>
 
@@ -14,7 +15,7 @@ public:
 	void initDevice(GLFWwindow* gameWindow, VkExtent2D extent);
 	void destroyDevice();
 
-	void draw(int frameNumber = 0);
+	void draw(int frameNumber, int selectedShader = 0);
 
 private:
 	void initVulkan();
@@ -52,12 +53,15 @@ private:
 	std::vector<VkImage> swapchainImages;
 	std::vector<VkImageView> swapchainImageViews;
 
-	VkPipelineLayout trianglePipelineLayout; // TEMP
+	VkPipelineLayout trianglePipelineLayout;
 
 	VkPipeline trianglePipeline;
+	VkPipeline coloredTrianglePipeline;
 
 	VkSemaphore presentSemaphore, renderSemaphore;
 	VkFence renderFence;
+
+	DeletionQueue mainDeletionQueue;
 };
 
 }

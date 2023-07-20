@@ -36,7 +36,7 @@ void VelDevice::initDevice(GLFWwindow* gameWindow, VkExtent2D extent) {
 	initPipelines();
 }
 
-void VelDevice::draw(int frameNumber) {
+void VelDevice::draw(int frameNumber, int selectedShader) {
 	VK_CHECK(vkWaitForFences(device, 1, &renderFence, true, 1000000000));
 	VK_CHECK(vkResetFences(device, 1, &renderFence));
 
@@ -70,8 +70,10 @@ void VelDevice::draw(int frameNumber) {
 
 	vkCmdBeginRenderPass(cmd, &rpInfo, VK_SUBPASS_CONTENTS_INLINE);
 
+	auto pipeline = selectedShader ? trianglePipeline : coloredTrianglePipeline;
+
 	// triangle rendering
-	vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, trianglePipeline);
+	vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 	vkCmdDraw(cmd, 3, 1, 0, 0);
 
 	vkCmdEndRenderPass(cmd);
@@ -106,20 +108,7 @@ void VelDevice::draw(int frameNumber) {
 void VelDevice::destroyDevice() {
 	vkDeviceWaitIdle(device);
 
-	vkDestroyCommandPool(device, commandPool, nullptr);
-
-	vkDestroyFence(device, renderFence, nullptr);
-	vkDestroySemaphore(device, renderSemaphore, nullptr);
-	vkDestroySemaphore(device, presentSemaphore, nullptr);
-
-	vkDestroySwapchainKHR(device, swapchain, nullptr);
-
-	vkDestroyRenderPass(device, renderPass, nullptr);
-
-	for (size_t i = 0; i < framebuffers.size(); i++) {
-		vkDestroyFramebuffer(device, framebuffers[i], nullptr);
-		vkDestroyImageView(device, swapchainImageViews[i], nullptr);
-	}
+	mainDeletionQueue.flush();
 
 	vkDestroySurfaceKHR(instance, surface, nullptr);
 
@@ -178,6 +167,10 @@ void VelDevice::initSwapchain() {
 	swapchainImageViews = vkbSwapchain.get_image_views().value();
 
 	swapchainImageFormat = vkbSwapchain.image_format;
+
+	VK_DELETE_PUSH(
+		mainDeletionQueue,
+		vkDestroySwapchainKHR(device, swapchain, nullptr));
 }
 
 void VelDevice::initDefaultRenderPass() {
@@ -208,6 +201,10 @@ void VelDevice::initDefaultRenderPass() {
 	renderPassInfo.pSubpasses = &subpass;
 
 	VK_CHECK(vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass));
+
+	VK_DELETE_PUSH(
+		mainDeletionQueue,
+		vkDestroyRenderPass(device, renderPass, nullptr));
 }
 
 void VelDevice::initFramebuffers() {
@@ -219,6 +216,11 @@ void VelDevice::initFramebuffers() {
 	for (size_t i = 0; i < swapChainImageCount; i++) {
 		fbInfo.pAttachments = &swapchainImageViews[i];
 		VK_CHECK(vkCreateFramebuffer(device, &fbInfo, nullptr, &framebuffers[i]));
+
+		VK_DELETE_PUSH(
+			mainDeletionQueue,
+			vkDestroyFramebuffer(device, framebuffers[i], nullptr),
+			vkDestroyImageView(device, swapchainImageViews[i], nullptr));
 	}
 }
 
@@ -232,6 +234,10 @@ void VelDevice::initCommands() {
 		vkinit::commandBufferAllocateInfo(commandPool);
 
 	VK_CHECK(vkAllocateCommandBuffers(device, &cmdAllocInfo, &mainCommandBuffer));
+
+	VK_DELETE_PUSH(
+		mainDeletionQueue,
+		vkDestroyCommandPool(device, commandPool, nullptr));
 }
 
 void VelDevice::initSyncStrucutres() {
@@ -239,15 +245,24 @@ void VelDevice::initSyncStrucutres() {
 
 	VK_CHECK(vkCreateFence(device, &fenceCreateInfo, nullptr, &renderFence));
 
+	VK_DELETE_PUSH(mainDeletionQueue, vkDestroyFence(device, renderFence, nullptr));
+
 	VkSemaphoreCreateInfo semaphoreCreateInfo = vkinit::semaphoreCreateInfo();
 
 	VK_CHECK(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &presentSemaphore));
 	VK_CHECK(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &renderSemaphore));
+
+	VK_DELETE_PUSH(
+		mainDeletionQueue,
+		vkDestroySemaphore(device, presentSemaphore, nullptr),
+		vkDestroySemaphore(device, renderSemaphore, nullptr));
 }
 
 void VelDevice::initPipelines() {
 	auto triangleVertexShader = createShaderModule("shaders/triangle.vert.spv");
 	auto triangleFragShader = createShaderModule("shaders/triangle.frag.spv");
+	auto coloredTriangleVertexShader = createShaderModule("shaders/colored_triangle.vert.spv");
+	auto coloredTriangleFragShader = createShaderModule("shaders/colored_triangle.frag.spv");
 
 	auto pipelineLayoutInfo = vkinit::pipelineLayoutCreateInfo();
 	VK_CHECK(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &trianglePipelineLayout));
@@ -284,8 +299,26 @@ void VelDevice::initPipelines() {
 
 	trianglePipeline = pipelineBuilder.buildPipeline(device, renderPass);
 
-	vkDestroyShaderModule(device, triangleVertexShader, nullptr);
+	pipelineBuilder.shaderStages.clear();
+
+	pipelineBuilder.shaderStages.push_back(
+		vkinit::pipelineShaderStageCreateInfo(VK_SHADER_STAGE_VERTEX_BIT, coloredTriangleVertexShader));
+
+	pipelineBuilder.shaderStages.push_back(
+		vkinit::pipelineShaderStageCreateInfo(VK_SHADER_STAGE_FRAGMENT_BIT, coloredTriangleFragShader));
+
+	coloredTrianglePipeline = pipelineBuilder.buildPipeline(device, renderPass);
+
+	vkDestroyShaderModule(device, coloredTriangleFragShader, nullptr);
+	vkDestroyShaderModule(device, coloredTriangleVertexShader, nullptr);
 	vkDestroyShaderModule(device, triangleFragShader, nullptr);
+	vkDestroyShaderModule(device, triangleVertexShader, nullptr);
+
+	VK_DELETE_PUSH(
+		mainDeletionQueue,
+		vkDestroyPipeline(device, trianglePipeline, nullptr),
+		vkDestroyPipeline(device, coloredTrianglePipeline, nullptr),
+		vkDestroyPipelineLayout(device, trianglePipelineLayout, nullptr));
 }
 
 VkShaderModule VelDevice::createShaderModule(const char* fileName) {

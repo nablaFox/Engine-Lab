@@ -43,7 +43,7 @@ void VelEngine::processEvents() {
 }
 
 void VelEngine::draw() {
-	device->draw(frameNumber);
+	device->draw(frameNumber, selectedShader);
 	frameNumber++;
 }
 
@@ -67,6 +67,11 @@ void VelEngine::destroy() {
 bool VelEngine::isKeyDown(int key) {
 	if (keyboard == nullptr) return false;
 	return keyboard->isKeyDown(key);
+}
+
+bool VelEngine::wasKeyPressed(int key) {
+	if (keyboard == nullptr) return false;
+	return keyboard->wasKeyPressed(key);
 }
 
 }

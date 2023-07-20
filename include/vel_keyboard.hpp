@@ -9,6 +9,7 @@ class VelKeyboard {
 public:
 	void initKeyboard(GLFWwindow* window);
 	bool isKeyDown(int key);
+	bool wasKeyPressed(int key);
 
 private:
 	std::map<int, bool> keys;

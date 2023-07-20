@@ -19,6 +19,7 @@ public:
 
 	bool isInitialized{ false };
 	int frameNumber{ 0 };
+	int selectedShader{ 0 };
 
 	void init(const GameEngineSettings& settings = DefaultSettings);
 	void destroy();
@@ -28,6 +29,7 @@ public:
 
 	bool isOpen() { return !glfwWindowShouldClose(gameWindow); }
 	bool isKeyDown(int key);
+	bool wasKeyPressed(int key);
 
 private:
 	VelDevice* device{ nullptr };

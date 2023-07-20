@@ -10,7 +10,11 @@ int main() {
 
 		if (engine.isKeyDown(GLFW_KEY_ESCAPE)) break;
 
-		engine.draw(); // TEMP
+		if (engine.wasKeyPressed(GLFW_KEY_SPACE)) {
+			engine.selectedShader = !engine.selectedShader;
+		}
+
+		engine.draw();
 	}
 
 	engine.destroy();

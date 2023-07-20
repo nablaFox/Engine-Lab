@@ -7,11 +7,17 @@ void VelKeyboard::initKeyboard(GLFWwindow* window) {
 	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
 		VelKeyboard* keyboard = static_cast<VelKeyboard*>(glfwGetWindowUserPointer(window));
 		keyboard->keyCallback(window, key, scancode, action, mods);
-		});
+	});
 }
 
 bool VelKeyboard::isKeyDown(int key) {
 	return keys.find(key) != keys.end() ? keys[key] : false;
+}
+
+bool VelKeyboard::wasKeyPressed(int key) {
+	bool pressed = keys[key];
+	keys[key] = false;
+	return pressed;
 }
 
 void VelKeyboard::keyCallback(

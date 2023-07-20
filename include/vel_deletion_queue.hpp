@@ -1,3 +1,5 @@
+#pragma once
+
 #include <functional>
 #include <deque>
 #include <initializer_list>

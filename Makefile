@@ -1,7 +1,7 @@
 # tool
 CXX = g++
 CFLAGS = -std=c++17 -Wall -Wextra -Wpedantic
-CFLAGS += -Ilib/glm -Ilib/glfw/include -Ilib/vkbootstrap
+CFLAGS += -Ilib/glm -Ilib/glfw/include -Ilib/vkbootstrap -Ilib/vma/include
 LDFLAGS = lib/glfw/src/libglfw3.a -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 GLSLC = glslc
 

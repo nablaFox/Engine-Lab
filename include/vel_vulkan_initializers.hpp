@@ -32,4 +32,20 @@ VkSubmitInfo submitInfo(VkCommandBuffer* cmd);
 
 VkPresentInfoKHR presentInfo();
 
+VkPipelineShaderStageCreateInfo pipelineShaderStageCreateInfo(
+	VkShaderStageFlagBits stage,
+	VkShaderModule shaderModule);
+
+VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo();
+
+VkPipelineInputAssemblyStateCreateInfo inputAssemblyCreateInfo(VkPrimitiveTopology topology);
+
+VkPipelineRasterizationStateCreateInfo rasterizationCreateInfo(VkPolygonMode polygonMode);
+
+VkPipelineMultisampleStateCreateInfo multisamplingStateCreateInfo();
+
+VkPipelineColorBlendAttachmentState colorBlendAttachmentState();
+
+VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo();
+
 }

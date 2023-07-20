@@ -43,7 +43,8 @@ void VelEngine::processEvents() {
 }
 
 void VelEngine::draw() {
-	device->draw();
+	device->draw(frameNumber);
+	frameNumber++;
 }
 
 void VelEngine::destroy() {

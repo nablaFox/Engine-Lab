@@ -1,5 +1,7 @@
 #include "../include/vel_device.hpp"
 #include "../include/vel_vulkan_initializers.hpp"
+#include "../include/vel_pipeline.hpp"
+#include "../include/vel_file.hpp"
 
 #include "VkBootstrap.h"
 
@@ -30,9 +32,11 @@ void VelDevice::initDevice(GLFWwindow* gameWindow, VkExtent2D extent) {
 	initCommands();
 
 	initSyncStrucutres();
+
+	initPipelines();
 }
 
-void VelDevice::draw() {
+void VelDevice::draw(int frameNumber) {
 	VK_CHECK(vkWaitForFences(device, 1, &renderFence, true, 1000000000));
 	VK_CHECK(vkResetFences(device, 1, &renderFence));
 
@@ -66,7 +70,9 @@ void VelDevice::draw() {
 
 	vkCmdBeginRenderPass(cmd, &rpInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-	// nothing to render
+	// triangle rendering
+	vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, trianglePipeline);
+	vkCmdDraw(cmd, 3, 1, 0, 0);
 
 	vkCmdEndRenderPass(cmd);
 	VK_CHECK(vkEndCommandBuffer(cmd));
@@ -95,8 +101,6 @@ void VelDevice::draw() {
 	presentInfo.pImageIndices = &swapchainImageIndex;
 
 	VK_CHECK(vkQueuePresentKHR(graphicsQueue, &presentInfo));
-
-	frameNumber++;
 }
 
 void VelDevice::destroyDevice() {
@@ -239,6 +243,71 @@ void VelDevice::initSyncStrucutres() {
 
 	VK_CHECK(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &presentSemaphore));
 	VK_CHECK(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &renderSemaphore));
+}
+
+void VelDevice::initPipelines() {
+	auto triangleVertexShader = createShaderModule("shaders/triangle.vert.spv");
+	auto triangleFragShader = createShaderModule("shaders/triangle.frag.spv");
+
+	auto pipelineLayoutInfo = vkinit::pipelineLayoutCreateInfo();
+	VK_CHECK(vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &trianglePipelineLayout));
+
+	PipelineBuilder pipelineBuilder;
+
+	pipelineBuilder.shaderStages.push_back(
+		vkinit::pipelineShaderStageCreateInfo(VK_SHADER_STAGE_VERTEX_BIT, triangleVertexShader));
+
+	pipelineBuilder.shaderStages.push_back(
+		vkinit::pipelineShaderStageCreateInfo(VK_SHADER_STAGE_FRAGMENT_BIT, triangleFragShader));
+
+	pipelineBuilder.vertexInputInfo = vkinit::vertexInputStateCreateInfo();
+
+	pipelineBuilder.inputAssembly = vkinit::inputAssemblyCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+
+	pipelineBuilder.viewport.x = 0.0f;
+	pipelineBuilder.viewport.y = 0.0f;
+	pipelineBuilder.viewport.width = (float)windowExtent.width;
+	pipelineBuilder.viewport.height = (float)windowExtent.height;
+	pipelineBuilder.viewport.minDepth = 0.0f;
+	pipelineBuilder.viewport.maxDepth = 1.0f;
+
+	pipelineBuilder.scissor.offset = { 0, 0 };
+	pipelineBuilder.scissor.extent = windowExtent;
+
+	pipelineBuilder.rasterizer = vkinit::rasterizationCreateInfo(VK_POLYGON_MODE_FILL);
+
+	pipelineBuilder.multisampling = vkinit::multisamplingStateCreateInfo();
+
+	pipelineBuilder.colorBlendAttachment = vkinit::colorBlendAttachmentState();
+
+	pipelineBuilder.pipelineLayout = trianglePipelineLayout;
+
+	trianglePipeline = pipelineBuilder.buildPipeline(device, renderPass);
+
+	vkDestroyShaderModule(device, triangleVertexShader, nullptr);
+	vkDestroyShaderModule(device, triangleFragShader, nullptr);
+}
+
+VkShaderModule VelDevice::createShaderModule(const char* fileName) {
+	VelFile file{ fileName };
+
+	if (!file.isOpen()) {
+		std::cout << "Failed to load file: " << fileName << std::endl;
+		std::abort();
+	}
+
+	std::cout << "File " << fileName << " successfully loaded" << std::endl;
+
+	VkShaderModuleCreateInfo createInfo{};
+	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	createInfo.pNext = nullptr;
+	createInfo.codeSize = file.getFileLength();
+	createInfo.pCode = reinterpret_cast<const uint32_t*>(file.getData());
+
+	VkShaderModule shaderModule;
+	VK_CHECK(vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule));
+
+	return shaderModule;
 }
 
 }

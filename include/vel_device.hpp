@@ -14,9 +14,7 @@ public:
 	void initDevice(GLFWwindow* gameWindow, VkExtent2D extent);
 	void destroyDevice();
 
-	void draw();
-
-	int frameNumber{ 0 };
+	void draw(int frameNumber = 0);
 
 private:
 	void initVulkan();
@@ -25,6 +23,9 @@ private:
 	void initFramebuffers();
 	void initCommands();
 	void initSyncStrucutres();
+	void initPipelines();
+
+	VkShaderModule createShaderModule(const char* fileName);
 
 private:
 	GLFWwindow* window;
@@ -50,6 +51,10 @@ private:
 	std::vector<VkFramebuffer> framebuffers;
 	std::vector<VkImage> swapchainImages;
 	std::vector<VkImageView> swapchainImageViews;
+
+	VkPipelineLayout trianglePipelineLayout; // TEMP
+
+	VkPipeline trianglePipeline;
 
 	VkSemaphore presentSemaphore, renderSemaphore;
 	VkFence renderFence;
